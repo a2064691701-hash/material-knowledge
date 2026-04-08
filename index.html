@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>材知道 | 机电材料智慧分析平台</title>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.js"></script>
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <!-- html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #2d6a4f;
+            --primary-light: #40916c;
+            --primary-dark: #1b4332;
+            --secondary: #74c69d;
+            --bg-start: #eef2f5;
+            --bg-end: #e0e8ef;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --text-primary: #1a2c3e;
+            --text-secondary: #4a6a5c;
+            --danger: #e63946;
+            --warning: #f39c12;
+            --success: #2d6a4f;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 30px -12px rgba(0,0,0,0.12);
+            --radius-sm: 20px;
+            --radius-md: 32px;
+            --radius-lg: 48px;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+            background: linear-gradient(145deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 30px;
+            font-size: 16px;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-sm);
+            padding: 0 32px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 110;
+            border-bottom: 1px solid rgba(45, 106, 79, 0.15);
+        }
+
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(130deg, var(--primary-dark), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 550;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary {
+            background: #f0f4f9;
+            border: 1px solid #dce3ec;
+            color: var(--primary);
+        }
+        .btn-secondary:hover { background: #e4ecf2; transform: translateY(-1px); }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .btn-icon {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 10px;
+            border-radius: 40px;
+            transition: 0.2s;
+            color: var(--primary);
+        }
+        .btn-icon:hover { background: #e9f5ef; }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 28px 32px;
+            transition: transform 0.2s ease;
+            transform-origin: top left;
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .material-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 20px 12px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.25s ease;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            position: relative;
+            cursor: pointer;
+        }
+        .material-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(45, 106, 79, 0.25);
+            box-shadow: var(--shadow-lg);
+        }
+        .material-card.add-new {
+            border: 2px dashed var(--secondary);
+            background: linear-gradient(135deg, #f9fefb, #eef6f0);
+        }
+
+        .material-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: var(--primary-dark); }
+        .material-badge {
+            font-size: 0.75rem;
+            color: #5b7c6a;
+            background: #eef3ef;
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+
+        .delete-card-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.05);
+            border: none;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #bc6c6c;
+            transition: 0.2s;
+            opacity: 0;
+        }
+        .material-card:hover .delete-card-btn { opacity: 1; }
+        .delete-card-btn:hover { background: #ffe6e6; color: var(--danger); }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(4px);
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .back-btn:hover { background: white; box-shadow: var(--shadow-sm); }
+
+        .detail-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: -0.3px;
+            flex: 1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(2px);
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .form-input, .form-select {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #d0dfd6;
+            background: white;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            width: 100%;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-sm);
+            background: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .data-table th {
+            background: #eef3f0;
+            padding: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #d9e2dc;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2ef;
+        }
+        .data-table tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .data-table tr:hover { background: #f8faf9; }
+        .data-table tr.selected { background: #e2f3e8 !important; }
+
+        .table-section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-main, .badge-accessory {
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-main { background: #e2f3e8; color: var(--primary); }
+        .badge-accessory { background: #fef3c7; color: #92400e; }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 968px) {
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-container { height: 280px; min-height: 280px; width: 100%; }
+        .chart-container.large { height: 360px; }
+
+        .alert-box {
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+        }
+        .alert-box.warning {
+            background: #fff9ef;
+            border-left: 4px solid var(--warning);
+        }
+        .alert-box.success {
+            background: #eef6ef;
+            border-left: 4px solid var(--success);
+        }
+
+        .threshold-controls {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .threshold-input {
+            width: 70px;
+            padding: 6px 10px;
+            border-radius: 30px;
+            border: 1px solid #cbdcd0;
+            background: white;
+            margin-left: 6px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 30, 25, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            max-width: 550px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.2);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header { padding: 24px 28px 16px; border-bottom: 1px solid #eef2ef; }
+        .modal-body { padding: 20px 28px; }
+        .modal-footer { padding: 16px 28px 24px; display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 28px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #8aa0b5;
+        }
+        .modal-close:hover { color: var(--danger); }
+
+        .drag-control {
+            position: fixed;
+            z-index: 1000;
+            user-select: none;
+        }
+        .drag-control-inner {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(45, 106, 79, 0.25);
+            border-radius: 60px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-md);
+            cursor: grab;
+        }
+        .drag-control-inner:active { cursor: grabbing; }
+        .drag-handle { cursor: grab; font-size: 1.1rem; color: #5b8c6f; }
+
+        .knowledge-footer {
+            background: linear-gradient(115deg, #eaf6ef, #ddebe2);
+            border-radius: 60px;
+            padding: 16px 28px;
+            margin: 40px 32px 20px;
+            text-align: center;
+            font-weight: 550;
+            color: var(--primary-dark);
+            border: 1px solid rgba(45, 106, 79, 0.2);
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: #6b8b7a;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #8ba596;
+        }
+        @media (max-width: 768px) {
+            .navbar { padding: 0 16px; height: 60px; }
+            .logo { font-size: 1.3rem; }
+            .app-container { padding: 16px; }
+            .materials-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .detail-title { font-size: 1.5rem; }
+            .card { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="logo">📐 材知道 · 机电智慧分析</div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" @click="showMergeModal = true">🔗 材料合并</button>
+                <button class="btn btn-primary" @click="exportGlobalReport">📎 导出报告</button>
+            </div>
+        </nav>
+
+        <main class="app-container" :style="containerStyle">
+            <!-- 主页 -->
+            <div v-if="currentView === 'home'">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 600; color: var(--primary-dark);">📦 机电材料库</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">点击卡片深度分析 · 右上角快速删除</p>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #6b8b7a;">共 {{ materialList.length }} 种材料</div>
+                </div>
+                <div class="materials-grid">
+                    <div v-for="mat in materialList" :key="mat.id" class="material-card" @click="openMaterialDetail(mat)">
+                        <button class="delete-card-btn" @click.stop="confirmDeleteMaterial(mat)">✖ 删除</button>
+                        <div class="material-name">{{ mat.name }}</div>
+                        <div class="material-badge">{{ (mat.expect?.length || 0) + (mat.actual?.length || 0) }} 条数据记录</div>
+                    </div>
+                    <div class="material-card add-new" @click="addNewMaterial">
+                        <div class="material-name" style="font-size: 2.5rem; color: var(--primary);">+</div>
+                        <div class="material-badge">创建新材料</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 详情页 -->
+            <div v-else-if="currentView === 'detail' && currentMaterial">
+                <div class="detail-header">
+                    <button class="back-btn" @click="goBackHome">←</button>
+                    <h1 class="detail-title">{{ currentMaterial.name }}</h1>
+                    <button class="btn btn-primary" @click="exportMaterialReport">📄 导出分析报告</button>
+                </div>
+
+                <!-- 数据录入 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">✏️ 数据录入 / 编辑</div>
+                        <div style="font-size: 0.8rem; color: #58856b;">💡 点击表格行选中修改，支持多币种</div>
+                    </div>
+                    <div class="form-grid">
+                        <input v-model="editForm.materialName" class="form-input" placeholder="材料名称">
+                        <input v-model="editForm.model" class="form-input" placeholder="型号规格">
+                        <input v-model.number="editForm.bq" type="number" class="form-input" placeholder="BQ量">
+                        <input v-model.number="editForm.contract" type="number" class="form-input" placeholder="合同图量">
+                        <input v-model.number="editForm.orderQty" type="number" class="form-input" placeholder="订货量">
+                        <input v-model.number="editForm.arrivalQty" type="number" class="form-input" placeholder="到货量">
+                        <input v-model.number="editForm.unitPrice" type="number" class="form-input" placeholder="单价">
+                        <input v-model.number="editForm.totalPrice" type="number" class="form-input" placeholder="总价">
+                        <select v-model="editForm.currency" class="form-select">
+                            <option value="CNY">🇨🇳 CNY 人民币</option>
+                            <option value="HKD">🇭🇰 HKD 港币</option>
+                            <option value="MOP">🇲🇴 MOP 澳门元</option>
+                            <option value="USD">🇺🇸 USD 美元</option>
+                        </select>
+                        <select v-model="editForm.isAccessory" class="form-select">
+                            <option :value="false">主材</option>
+                            <option :value="true">配件</option>
+                        </select>
+                        <input v-model.number="editForm.expectRatio" type="number" class="form-input" placeholder="预期比例%">
+                        <input v-model.number="editForm.actualRatio" type="number" class="form-input" placeholder="实际比例%">
+                        <select v-model="editForm.dataType" class="form-select">
+                            <option value="expect">预期数据</option>
+                            <option value="actual">实际数据</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" @click="saveRecord">💾 {{ selectedRecord ? '更新' : '保存' }}</button>
+                        <button v-if="selectedRecord" class="btn btn-secondary" @click="clearSelection">取消选中</button>
+                    </div>
+                </div>
+
+                <!-- 数据表格 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 详细数据记录</div>
+                        <button class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.8rem;" @click="toggleSection('dataTable')">
+                            {{ hiddenSections.dataTable ? '👁️ 显示' : '🙈 隐藏' }}
+                        </button>
+                    </div>
+                    <div v-show="!hiddenSections.dataTable">
+                        <div class="table-section-title">📌 预期数据 ({{ expectRecords.length }} 条)</div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>订货量</th><th>单价</th><th>总价</th><th>币种</th><th>类型</th><th>比例%</th><th>操作</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="row in expectRecords" :key="row.id" :class="{ selected: selectedRecord && selectedRecord.id === row.id }" @click="selectRecord(row, 'expect')">
+                                        <td>{{ row.materialName }}</td><td>{{ row.model }}</td>
+                                        <td>{{ formatNumber(row.bq) }}</td><td>{{ formatNumber(row.contract) }}</td>
+                                        <td>{{ formatNumber(row.orderQty) }}</td>
+                                        <td>{{ formatCurrency(row.unitPrice, row.currency) }}</td>
+                                        <td>{{ formatCurrency(row.totalPrice, row.currency) }}</td>
+                                        <td>{{ row.currency }}</td>
+                                        <td><span :class="row.isAccessory ? 'badge-accessory' : 'badge-main'">{{ row.isAccessory ? '配件' : '主材' }}</span></td>
+                                        <td>{{ row.expectRatio }}%</td>
+                                        <td><button class="btn-icon" @click.stop="deleteRecord(row, 'expect')">🗑️</button></td>
+                                    </tr>
+                                    <tr v-if="expectRecords.length === 0"><td colspan="11" class="empty-state">暂无预期数据</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-section-title">📌 实际数据 ({{ actualRecords.length }} 条)</div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>到货量</th><th>单价</th><th>总价</th><th>币种</th><th>类型</th><th>比例%</th><th>操作</th></tr></thead>
+                                <tbody>
+                                    <tr v-for="row in actualRecords" :key="row.id" :class="{ selected: selectedRecord && selectedRecord.id === row.id }" @click="selectRecord(row, 'actual')">
+                                        <td>{{ row.materialName }}</td><td>{{ row.model }}</td>
+                                        <td>{{ formatNumber(row.bq) }}</td><td>{{ formatNumber(row.contract) }}</td>
+                                        <td>{{ formatNumber(row.arrivalQty) }}</td>
+                                        <td>{{ formatCurrency(row.unitPrice, row.currency) }}</td>
+                                        <td>{{ formatCurrency(row.totalPrice, row.currency) }}</td>
+                                        <td>{{ row.currency }}</td>
+                                        <td><span :class="row.isAccessory ? 'badge-accessory' : 'badge-main'">{{ row.isAccessory ? '配件' : '主材' }}</span></td>
+                                        <td>{{ row.actualRatio }}%</td>
+                                        <td><button class="btn-icon" @click.stop="deleteRecord(row, 'actual')">🗑️</button></td>
+                                    </tr>
+                                    <tr v-if="actualRecords.length === 0"><td colspan="11" class="empty-state">暂无实际数据</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📊 数量对比分析</div>
+                        <div class="card-actions" style="display: flex; gap: 8px;">
+                            <select class="form-select" style="width: 100px;" @change="switchChartType('quantity', $event.target.value)">
+                                <option value="bar">柱状图</option><option value="line">折线图</option>
+                            </select>
+                            <button class="btn btn-secondary" style="padding: 6px 16px;" @click="toggleSection('quantityChart')">
+                                {{ hiddenSections.quantityChart ? '👁️ 显示' : '🙈 隐藏' }}
+                            </button>
+                        </div>
+                    </div>
+                    <div v-show="!hiddenSections.quantityChart"><div id="quantityChart" class="chart-container large"></div></div>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">💰 单价对比</div>
+                            <div><select class="form-select" style="width: 100px;" @change="switchChartType('unitPrice', $event.target.value)">
+                                <option value="bar">柱状图</option><option value="line">折线图</option>
+                            </select>
+                            <button class="btn btn-secondary" style="padding: 6px 16px;" @click="toggleSection('unitPriceChart')">{{ hiddenSections.unitPriceChart ? '👁️ 显示' : '🙈 隐藏' }}</button></div>
+                        </div>
+                        <div v-show="!hiddenSections.unitPriceChart"><div id="unitPriceChart" class="chart-container"></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">💵 总价对比</div>
+                            <div><select class="form-select" style="width: 100px;" @change="switchChartType('totalPrice', $event.target.value)">
+                                <option value="bar">柱状图</option><option value="line">折线图</option>
+                            </select>
+                            <button class="btn btn-secondary" style="padding: 6px 16px;" @click="toggleSection('totalPriceChart')">{{ hiddenSections.totalPriceChart ? '👁️ 显示' : '🙈 隐藏' }}</button></div>
+                        </div>
+                        <div v-show="!hiddenSections.totalPriceChart"><div id="totalPriceChart" class="chart-container"></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📐 预期配件比例</div>
+                            <div><select class="form-select" style="width: 100px;" @change="switchChartType('expectRatio', $event.target.value)">
+                                <option value="pie">饼图</option><option value="bar">柱状图</option>
+                            </select>
+                            <button class="btn btn-secondary" style="padding: 6px 16px;" @click="toggleSection('expectRatioChart')">{{ hiddenSections.expectRatioChart ? '👁️ 显示' : '🙈 隐藏' }}</button></div>
+                        </div>
+                        <div v-show="!hiddenSections.expectRatioChart"><div id="expectRatioChart" class="chart-container"></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📐 实际配件比例</div>
+                            <div><select class="form-select" style="width: 100px;" @change="switchChartType('actualRatio', $event.target.value)">
+                                <option value="pie">饼图</option><option value="bar">柱状图</option>
+                            </select>
+                            <button class="btn btn-secondary" style="padding: 6px 16px;" @click="toggleSection('actualRatioChart')">{{ hiddenSections.actualRatioChart ? '👁️ 显示' : '🙈 隐藏' }}</button></div>
+                        </div>
+                        <div v-show="!hiddenSections.actualRatioChart"><div id="actualRatioChart" class="chart-container"></div></div>
+                    </div>
+                </div>
+
+                <!-- 智能诊断 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">⚠️ 智能异常诊断</div>
+                        <button class="btn btn-secondary" style="padding: 6px 16px;" @click="toggleSection('alertBox')">{{ hiddenSections.alertBox ? '👁️ 显示' : '🙈 隐藏' }}</button>
+                    </div>
+                    <div v-show="!hiddenSections.alertBox">
+                        <div v-if="anomalies.length > 0" class="alert-box warning">
+                            <ul style="margin-left: 20px; margin-bottom: 12px;"><li v-for="a in anomalies" :key="a">{{ a }}</li></ul>
+                            <div class="threshold-controls">
+                                <label>数量偏差%<input v-model.number="thresholds.quantity" type="number" class="threshold-input" @change="recalculateAnomalies"></label>
+                                <label>价格偏差%<input v-model.number="thresholds.price" type="number" class="threshold-input" @change="recalculateAnomalies"></label>
+                                <label>配件比例偏差%<input v-model.number="thresholds.ratio" type="number" class="threshold-input" @change="recalculateAnomalies"></label>
+                            </div>
+                        </div>
+                        <div v-else class="alert-box success">✅ 一切正常，数据偏差在设定阈值内。</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 合并规则弹窗 -->
+        <div v-if="showMergeModal" class="modal-overlay" @click.self="showMergeModal = false">
+            <div class="modal-content">
+                <button class="modal-close" @click="showMergeModal = false">&times;</button>
+                <div class="modal-header"><h3>🔗 材料合并规则</h3></div>
+                <div class="modal-body">
+                    <div v-if="mergeRules.length === 0" class="empty-state">暂无合并规则</div>
+                    <div v-for="rule in mergeRules" :key="rule.original" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eef2ef;">
+                        <div>"{{ rule.original }}" → <strong>{{ rule.target }}</strong></div>
+                        <button class="btn btn-secondary" style="padding: 4px 12px;" @click="removeMergeRule(rule.original)">取消</button>
+                    </div>
+                    <hr style="margin: 20px 0;">
+                    <div style="font-weight: 600; margin-bottom: 12px;">➕ 手动添加合并</div>
+                    <div style="display: flex; gap: 10px;">
+                        <input v-model="newMergeOriginal" class="form-input" placeholder="原始名称" style="flex: 1;">
+                        <input v-model="newMergeTarget" class="form-input" placeholder="合并为目标" style="flex: 1;">
+                        <button class="btn btn-primary" @click="addMergeRule">添加</button>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary" @click="showMergeModal = false">关闭</button></div>
+            </div>
+        </div>
+
+        <!-- 可拖拽控件 -->
+        <div class="drag-control" :style="fontControlStyle">
+            <div class="drag-control-inner" @mousedown="startDrag('font', $event)">
+                <span class="drag-handle">⋮⋮</span>
+                <span>🔤 字体</span>
+                <button class="btn-icon" @click="changeFontSize(-1)">A-</button>
+                <span>|</span>
+                <button class="btn-icon" @click="changeFontSize(1)">A+</button>
+            </div>
+        </div>
+        <div class="drag-control" :style="zoomControlStyle">
+            <div class="drag-control-inner" @mousedown="startDrag('zoom', $event)">
+                <span class="drag-handle">⋮⋮</span>
+                <span>🔍 缩放</span>
+                <button class="btn-icon" @click="zoomPage(0.9)">−</button>
+                <span>|</span>
+                <button class="btn-icon" @click="zoomPage(1.1)">+</button>
+                <span>|</span>
+                <button class="btn-icon" @click="resetZoom">↺</button>
+            </div>
+        </div>
+
+        <div class="knowledge-footer">✨ 机电安装小知识 · {{ dailyTip }}</div>
+        <footer>材知道 · 智能机电材料分析 | Vue 3 + ECharts | 数据自动保存至浏览器 | 支持 CNY/HKD/MOP/USD</footer>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+
+        // 工具函数
+        const generateId = () => 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const formatNumber = (num) => num === undefined || num === null ? '-' : num.toLocaleString('zh-CN');
+        const formatCurrency = (amount, currency) => {
+            if (amount === undefined || amount === null) return '-';
+            const symbols = { CNY: '¥', HKD: 'HK$', MOP: 'MOP$', USD: '$' };
+            return `${symbols[currency] || '¥'}${Number(amount).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        };
+
+        // 从 localStorage 加载数据
+        const loadData = () => {
+            const saved = localStorage.getItem('czd-materials');
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch(e) { return null; }
+            }
+            return [
+                { id: generateId(), name: '电缆', expect: [], actual: [] },
+                { id: generateId(), name: '镀锌钢管', expect: [], actual: [] }
+            ];
+        };
+
+        const saveData = (data) => {
+            localStorage.setItem('czd-materials', JSON.stringify(data));
+        };
+
+        const loadMergeRules = () => {
+            const saved = localStorage.getItem('czd-merge-rules');
+            return saved ? JSON.parse(saved) : [];
+        };
+
+        const saveMergeRules = (rules) => {
+            localStorage.setItem('czd-merge-rules', JSON.stringify(rules));
+        };
+
+        const knowledgeDB = [
+            "🔧 桥架直线段>30m设伸缩节", "⚡ 小管让大管，有压让无压", "💧 镀锌钢管外露2-3扣防腐",
+            "📐 母线槽每层设弹簧支架", "🎛️ 风管弯头无导流片阻力+15%", "🔩 圆钢搭接6倍直径",
+            "📡 强弱电间距≥300mm", "🧯 喷淋试水管径≥25mm", "📏 桥架填充率≤40%",
+            "🔌 PE排与N排分开", "💡 水泵偏心异径管顶平", "🔥 防火阀距墙≤200mm"
+        ];
+
+        createApp({
+            setup() {
+                // 状态
+                const materials = ref(loadData());
+                const mergeRules = ref(loadMergeRules());
+                const currentView = ref('home');
+                const currentMaterial = ref(null);
+                const expectRecords = ref([]);
+                const actualRecords = ref([]);
+                const selectedRecord = ref(null);
+                const showMergeModal = ref(false);
+                const newMergeOriginal = ref('');
+                const newMergeTarget = ref('');
+                const scale = ref(1);
+                const baseFontSize = ref(16);
+                
+                // 编辑表单
+                const editForm = ref({
+                    id: null, materialName: '', model: '', bq: null, contract: null,
+                    orderQty: null, arrivalQty: null, unitPrice: null, totalPrice: null,
+                    currency: 'CNY', isAccessory: false, expectRatio: null, actualRatio: null, dataType: 'expect'
+                });
+                
+                // 隐藏状态
+                const hiddenSections = ref({
+                    dataTable: false, quantityChart: false, unitPriceChart: false,
+                    totalPriceChart: false, expectRatioChart: false, actualRatioChart: false, alertBox: false
+                });
+                
+                // 阈值和异常
+                const thresholds = ref({ quantity: 20, price: 15, ratio: 50 });
+                const anomalies = ref([]);
+                
+                // 图表类型
+                const chartTypes = ref({ quantity: 'bar', unitPrice: 'bar', totalPrice: 'bar', expectRatio: 'pie', actualRatio: 'pie' });
+                
+                // 图表实例
+                let chartInstances = {};
+                
+                // 控件位置
+                const fontControlPos = ref({ x: window.innerWidth - 160, y: window.innerHeight - 180 });
+                const zoomControlPos = ref({ x: window.innerWidth - 160, y: window.innerHeight - 110 });
+                
+                // 计算属性
+                const materialList = computed(() => materials.value);
+                const containerStyle = computed(() => ({ transform: `scale(${scale.value})`, transformOrigin: 'top left' }));
+                const fontControlStyle = computed(() => ({ left: `${fontControlPos.value.x}px`, top: `${fontControlPos.value.y}px`, right: 'auto', bottom: 'auto' }));
+                const zoomControlStyle = computed(() => ({ left: `${zoomControlPos.value.x}px`, top: `${zoomControlPos.value.y}px`, right: 'auto', bottom: 'auto' }));
+                const dailyTip = knowledgeDB[new Date().getDate() % knowledgeDB.length];
+                
+                // 保存数据
+                const saveAllData = () => {
+                    saveData(materials.value);
+                    saveMergeRules(mergeRules.value);
+                };
+                
+                // 添加新材料
+                const addNewMaterial = () => {
+                    const name = prompt('创建新材料，请输入名称：');
+                    if (name && name.trim()) {
+                        materials.value.push({ id: generateId(), name: name.trim(), expect: [], actual: [] });
+                        saveAllData();
+                    }
+                };
+                
+                // 删除材料
+                const confirmDeleteMaterial = (mat) => {
+                    if (confirm(`确定删除材料"${mat.name}"？相关数据将永久丢失。`)) {
+                        materials.value = materials.value.filter(m => m.id !== mat.id);
+                        saveAllData();
+                        if (currentMaterial.value && currentMaterial.value.id === mat.id) {
+                            currentView.value = 'home';
+                            currentMaterial.value = null;
+                        }
+                    }
+                };
+                
+                // 打开材料详情
+                const openMaterialDetail = (mat) => {
+                    currentMaterial.value = mat;
+                    expectRecords.value = JSON.parse(JSON.stringify(mat.expect || []));
+                    actualRecords.value = JSON.parse(JSON.stringify(mat.actual || []));
+                    currentView.value = 'detail';
+                    selectedRecord.value = null;
+                    for (let k in hiddenSections.value) hiddenSections.value[k] = false;
+                    setTimeout(() => refreshCharts(), 100);
+                };
+                
+                // 返回主页
+                const goBackHome = () => {
+                    if (currentMaterial.value) {
+                        const idx = materials.value.findIndex(m => m.id === currentMaterial.value.id);
+                        if (idx !== -1) {
+                            materials.value[idx].expect = expectRecords.value;
+                            materials.value[idx].actual = actualRecords.value;
+                            saveAllData();
+                        }
+                    }
+                    for (let key in chartInstances) {
+                        if (chartInstances[key]) chartInstances[key].dispose();
+                        delete chartInstances[key];
+                    }
+                    currentView.value = 'home';
+                    currentMaterial.value = null;
+                };
+                
+                // 选择记录
+                const selectRecord = (row, type) => {
+                    selectedRecord.value = row;
+                    editForm.value = {
+                        id: row.id, materialName: row.materialName, model: row.model || '',
+                        bq: row.bq, contract: row.contract, orderQty: row.orderQty,
+                        arrivalQty: row.arrivalQty, unitPrice: row.unitPrice, totalPrice: row.totalPrice,
+                        currency: row.currency || 'CNY', isAccessory: row.isAccessory,
+                        expectRatio: row.expectRatio, actualRatio: row.actualRatio, dataType: type
+                    };
+                };
+                
+                // 清空选择
+                const clearSelection = () => {
+                    selectedRecord.value = null;
+                    editForm.value = {
+                        id: null, materialName: currentMaterial.value?.name || '', model: '',
+                        bq: null, contract: null, orderQty: null, arrivalQty: null,
+                        unitPrice: null, totalPrice: null, currency: 'CNY', isAccessory: false,
+                        expectRatio: null, actualRatio: null, dataType: 'expect'
+                    };
+                };
+                
+                // 保存记录
+                const saveRecord = () => {
+                    const form = editForm.value;
+                    if (!form.materialName) { alert('材料名称必填'); return; }
+                    const newRecord = {
+                        id: form.id || generateId(), materialName: form.materialName, model: form.model || '',
+                        bq: Number(form.bq) || 0, contract: Number(form.contract) || 0,
+                        orderQty: Number(form.orderQty) || 0, arrivalQty: Number(form.arrivalQty) || 0,
+                        unitPrice: Number(form.unitPrice) || 0,
+                        totalPrice: Number(form.totalPrice) || (form.dataType === 'expect' ? (Number(form.orderQty) * Number(form.unitPrice)) : (Number(form.arrivalQty) * Number(form.unitPrice))),
+                        currency: form.currency, isAccessory: form.isAccessory,
+                        expectRatio: Number(form.expectRatio) || 0, actualRatio: Number(form.actualRatio) || 0
+                    };
+                    const targetArray = form.dataType === 'expect' ? expectRecords.value : actualRecords.value;
+                    if (form.id) {
+                        const idx = targetArray.findIndex(r => r.id === form.id);
+                        if (idx !== -1) targetArray[idx] = newRecord;
+                    } else {
+                        targetArray.push(newRecord);
+                    }
+                    clearSelection();
+                    refreshCharts();
+                    recalculateAnomalies();
+                };
+                
+                // 删除记录
+                const deleteRecord = (row, type) => {
+                    if (!confirm('确定删除这条记录？')) return;
+                    const targetArray = type === 'expect' ? expectRecords.value : actualRecords.value;
+                    const idx = targetArray.findIndex(r => r.id === row.id);
+                    if (idx !== -1) {
+                        targetArray.splice(idx, 1);
+                        if (selectedRecord.value && selectedRecord.value.id === row.id) clearSelection();
+                        refreshCharts();
+                        recalculateAnomalies();
+                    }
+                };
+                
+                // 切换隐藏
+                const toggleSection = (key) => {
+                    hiddenSections.value[key] = !hiddenSections.value[key];
+                    if (!hiddenSections.value[key] && key.indexOf('Chart') !== -1) {
+                        setTimeout(() => refreshCharts(), 50);
+                    }
+                };
+                
+                // 渲染图表
+                const refreshCharts = () => {
+                    if (!currentMaterial.value) return;
+                    
+                    const bq = expectRecords.value.reduce((s, r) => s + (r.bq || 0), 0);
+                    const contract = expectRecords.value.reduce((s, r) => s + (r.contract || 0), 0);
+                    const order = expectRecords.value.reduce((s, r) => s + (r.orderQty || 0), 0);
+                    const arrival = actualRecords.value.reduce((s, r) => s + (r.arrivalQty || 0), 0);
+                    
+                    const avgExpPrice = expectRecords.value.length ? expectRecords.value.reduce((s, r) => s + (r.unitPrice || 0), 0) / expectRecords.value.length : 0;
+                    const avgActPrice = actualRecords.value.length ? actualRecords.value.reduce((s, r) => s + (r.unitPrice || 0), 0) / actualRecords.value.length : 0;
+                    
+                    const totalExp = expectRecords.value.reduce((s, r) => s + (r.totalPrice || r.orderQty * r.unitPrice || 0), 0);
+                    const totalAct = actualRecords.value.reduce((s, r) => s + (r.totalPrice || r.arrivalQty * r.unitPrice || 0), 0);
+                    
+                    const calcRatio = (records) => {
+                        const main = records.filter(r => !r.isAccessory).reduce((s, r) => s + (r.totalPrice || 0), 0);
+                        const acc = records.filter(r => r.isAccessory).reduce((s, r) => s + (r.totalPrice || 0), 0);
+                        return main ? (acc / main) * 100 : 0;
+                    };
+                    const expRatio = calcRatio(expectRecords.value);
+                    const actRatio = calcRatio(actualRecords.value);
+                    
+                    const renderChart = (id, option) => {
+                        const dom = document.getElementById(id);
+                        if (!dom) return;
+                        if (chartInstances[id]) chartInstances[id].dispose();
+                        chartInstances[id] = echarts.init(dom);
+                        chartInstances[id].setOption(option);
+                    };
+                    
+                    renderChart('quantityChart', {
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { type: 'category', data: ['BQ量', '合同图量', '订货量', '到货量'] },
+                        yAxis: { type: 'value' },
+                        series: [{ type: chartTypes.value.quantity, data: [bq, contract, order, arrival], itemStyle: { color: '#2d6a4f', borderRadius: [4,4,0,0] } }]
+                    });
+                    
+                    renderChart('unitPriceChart', {
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { type: 'category', data: ['预期', '实际'] },
+                        yAxis: { type: 'value' },
+                        series: [{ type: chartTypes.value.unitPrice, data: [avgExpPrice, avgActPrice], itemStyle: { color: ['#74c69d', '#2d6a4f'] } }]
+                    });
+                    
+                    renderChart('totalPriceChart', {
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { type: 'category', data: ['预期', '实际'] },
+                        yAxis: { type: 'value' },
+                        series: [{ type: chartTypes.value.totalPrice, data: [totalExp, totalAct], itemStyle: { color: ['#74c69d', '#2d6a4f'] } }]
+                    });
+                    
+                    renderChart('expectRatioChart', {
+                        tooltip: { trigger: 'item' },
+                        series: [{ type: chartTypes.value.expectRatio, data: [{ name: '配件成本', value: expRatio }, { name: '主材成本', value: Math.max(0, 100 - expRatio) }], radius: '55%' }]
+                    });
+                    
+                    renderChart('actualRatioChart', {
+                        tooltip: { trigger: 'item' },
+                        series: [{ type: chartTypes.value.actualRatio, data: [{ name: '配件成本', value: actRatio }, { name: '主材成本', value: Math.max(0, 100 - actRatio) }], radius: '55%' }]
+                    });
+                };
+                
+                // 切换图表类型
+                const switchChartType = (chart, type) => {
+                    chartTypes.value[chart] = type;
+                    refreshCharts();
+                };
+                
+                // 重新计算异常
+                const recalculateAnomalies = () => {
+                    const t = thresholds.value;
+                    const results = [];
+                    
+                    const totalOrder = expectRecords.value.reduce((s, r) => s + (r.orderQty || 0), 0);
+                    const totalArrival = actualRecords.value.reduce((s, r) => s + (r.arrivalQty || 0), 0);
+                    const orderDev = totalOrder ? ((totalArrival - totalOrder) / totalOrder) * 100 : 0;
+                    if (Math.abs(orderDev) > t.quantity) results.push(`⚠️ 订货到货偏差 ${orderDev > 0 ? '+' : ''}${orderDev.toFixed(1)}% (阈值 ${t.quantity}%)`);
+                    
+                    const avgExp = expectRecords.value.length ? expectRecords.value.reduce((s, r) => s + (r.unitPrice || 0), 0) / expectRecords.value.length : 0;
+                    const avgAct = actualRecords.value.length ? actualRecords.value.reduce((s, r) => s + (r.unitPrice || 0), 0) / actualRecords.value.length : 0;
+                    const priceDev = avgExp ? ((avgAct - avgExp) / avgExp) * 100 : 0;
+                    if (Math.abs(priceDev) > t.price) results.push(`⚠️ 单价偏差 ${priceDev > 0 ? '+' : ''}${priceDev.toFixed(1)}% (阈值 ${t.price}%)`);
+                    
+                    const totalExp = expectRecords.value.reduce((s, r) => s + (r.totalPrice || r.orderQty * r.unitPrice || 0), 0);
+                    const totalAct = actualRecords.value.reduce((s, r) => s + (r.totalPrice || r.arrivalQty * r.unitPrice || 0), 0);
+                    const totalDev = totalExp ? ((totalAct - totalExp) / totalExp) * 100 : 0;
+                    if (Math.abs(totalDev) > t.price) results.push(`⚠️ 总价偏差 ${totalDev > 0 ? '+' : ''}${totalDev.toFixed(1)}% (阈值 ${t.price}%)`);
+                    
+                    const calcRatio = (records) => {
+                        const main = records.filter(r => !r.isAccessory).reduce((s, r) => s + (r.totalPrice || 0), 0);
+                        const acc = records.filter(r => r.isAccessory).reduce((s, r) => s + (r.totalPrice || 0), 0);
+                        return main ? (acc / main) * 100 : 0;
+                    };
+                    const expRatio = calcRatio(expectRecords.value);
+                    const actRatio = calcRatio(actualRecords.value);
+                    const ratioDev = expRatio ? Math.abs((actRatio - expRatio) / expRatio) * 100 : 0;
+                    if (ratioDev > t.ratio) results.push(`⚠️ 配件比例偏差 ${ratioDev.toFixed(1)}% (阈值 ${t.ratio}%)`);
+                    
+                    anomalies.value = results;
+                };
+                
+                // 合并规则操作
+                const addMergeRule = () => {
+                    if (newMergeOriginal.value && newMergeTarget.value) {
+                        mergeRules.value = mergeRules.value.filter(r => r.original !== newMergeOriginal.value);
+                        mergeRules.value.push({ original: newMergeOriginal.value.trim(), target: newMergeTarget.value.trim() });
+                        saveMergeRules(mergeRules.value);
+                        newMergeOriginal.value = '';
+                        newMergeTarget.value = '';
+                    }
+                };
+                const removeMergeRule = (original) => {
+                    mergeRules.value = mergeRules.value.filter(r => r.original !== original);
+                    saveMergeRules(mergeRules.value);
+                };
+                
+                // 导出
+                const exportMaterialReport = () => {
+                    const element = document.querySelector('.app-container');
+                    if (element) {
+                        html2pdf().from(element).set({ filename: `${currentMaterial.value.name}_分析报告.pdf`, margin: 10 }).save();
+                    }
+                };
+                const exportGlobalReport = () => {
+                    const reportData = { generatedAt: new Date().toISOString(), materials: materials.value.map(m => ({ name: m.name, expectCount: m.expect.length, actualCount: m.actual.length })) };
+                    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = `材知道_报告.json`; a.click(); URL.revokeObjectURL(url);
+                };
+                
+                // 缩放和字体
+                const zoomPage = (factor) => { const ns = scale.value * factor; if (ns >= 0.7 && ns <= 1.6) scale.value = ns; };
+                const resetZoom = () => scale.value = 1;
+                const changeFontSize = (delta) => { const ns = baseFontSize.value + delta; if (ns >= 12 && ns <= 24) { baseFontSize.value = ns; document.documentElement.style.fontSize = ns + 'px'; } };
+                
+                // 拖拽
+                let dragState = null;
+                const startDrag = (type, e) => {
+                    const pos = type === 'font' ? fontControlPos.value : zoomControlPos.value;
+                    dragState = { type, startX: e.clientX, startY: e.clientY, initialX: pos.x, initialY: pos.y };
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('mouseup', stopDrag);
+                    e.preventDefault();
+                };
+                const onDrag = (e) => {
+                    if (!dragState) return;
+                    const pos = dragState.type === 'font' ? fontControlPos.value : zoomControlPos.value;
+                    const dx = e.clientX - dragState.startX;
+                    const dy = e.clientY - dragState.startY;
+                    pos.x = Math.max(0, Math.min(window.innerWidth - 120, dragState.initialX + dx));
+                    pos.y = Math.max(0, Math.min(window.innerHeight - 60, dragState.initialY + dy));
+                };
+                const stopDrag = () => { dragState = null; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); };
+                
+                // 监听数据变化
+                watch([expectRecords, actualRecords], () => {
+                    refreshCharts();
+                    recalculateAnomalies();
+                }, { deep: true });
+                
+                onMounted(() => {
+                    document.documentElement.style.fontSize = baseFontSize.value + 'px';
+                    window.addEventListener('resize', () => {
+                        setTimeout(() => refreshCharts(), 100);
+                    });
+                });
+                
+                return {
+                    materialList, mergeRules, currentView, currentMaterial, expectRecords, actualRecords,
+                    selectedRecord, editForm, hiddenSections, thresholds, anomalies, showMergeModal,
+                    newMergeOriginal, newMergeTarget, scale, containerStyle, fontControlStyle, zoomControlStyle,
+                    dailyTip, chartTypes, formatNumber, formatCurrency,
+                    addNewMaterial, confirmDeleteMaterial, openMaterialDetail, goBackHome,
+                    selectRecord, clearSelection, saveRecord, deleteRecord, toggleSection,
+                    switchChartType, recalculateAnomalies, addMergeRule, removeMergeRule,
+                    exportMaterialReport, exportGlobalReport, zoomPage, resetZoom, changeFontSize, startDrag
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
