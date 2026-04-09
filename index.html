@@ -13,26 +13,29 @@
     <!-- html2pdf -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
-            background: #f1f5f9;
-            color: #0f172a;
-            font-size: 14px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* 滚动条 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
 
-        /* 导航栏 */
         .navbar {
             background: white;
             border-bottom: 1px solid #e2e8f0;
             padding: 0 32px;
-            height: 64px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -44,23 +47,23 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #059669, #10b981);
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            background: #059669;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .logo-text {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #0f172a;
         }
@@ -109,7 +112,7 @@
         .control-group {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             margin-left: 8px;
             padding-left: 8px;
             border-left: 1px solid #e2e8f0;
@@ -130,15 +133,58 @@
             color: #059669;
         }
 
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-            transition: transform 0.2s;
-            transform-origin: top left;
+        .app-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
-        /* 页面头部 */
+        .app-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 24px;
+            padding: 24px 0;
+            transition: transform 0.2s;
+            transform-origin: center top;
+        }
+
+        /* 搜索和筛选栏 */
+        .search-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            border: 1px solid #eef2f6;
+        }
+
+        .search-input {
+            flex: 2;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #059669;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+            min-width: 120px;
+        }
+
         .page-header {
             margin-bottom: 20px;
             display: flex;
@@ -159,13 +205,11 @@
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 500;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
             transition: all 0.2s;
+            font-size: 0.85rem;
         }
 
         .btn-primary:hover {
@@ -181,13 +225,14 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.85rem;
         }
 
         .btn-secondary:hover {
             background: #f8fafc;
         }
 
-        /* ========== 长条形材料卡片 ========== */
+        /* 长条形材料列表 */
         .material-list {
             display: flex;
             flex-direction: column;
@@ -196,7 +241,7 @@
 
         .material-row {
             background: white;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 16px 20px;
             display: flex;
             align-items: center;
@@ -210,12 +255,12 @@
 
         .material-row:hover {
             border-color: #cbd5e1;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .material-info {
             flex: 2;
-            min-width: 150px;
+            min-width: 180px;
         }
 
         .material-name {
@@ -228,12 +273,21 @@
         .material-meta {
             font-size: 0.75rem;
             color: #64748b;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .material-meta span {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 12px;
         }
 
         .material-stats {
             flex: 1;
             text-align: right;
-            min-width: 120px;
+            min-width: 140px;
         }
 
         .material-amount {
@@ -283,14 +337,91 @@
             color: #059669;
         }
 
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #eef2f6;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .form-label .required {
+            color: #ef4444;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #059669;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            font-family: inherit;
+        }
+
         /* 卡片通用样式 */
         .card {
             background: white;
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 20px 24px;
             margin-bottom: 20px;
             border: 1px solid #eef2f6;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
         }
 
         .card-header {
@@ -306,12 +437,8 @@
             font-size: 1rem;
             font-weight: 600;
             color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        /* 可折叠区域 */
         .collapsible {
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -331,7 +458,6 @@
             cursor: pointer;
             font-size: 0.75rem;
             color: #64748b;
-            transition: all 0.2s;
         }
 
         .toggle-btn:hover {
@@ -339,18 +465,14 @@
             color: #059669;
         }
 
-        /* 结论卡片 */
         .conclusion-card {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border-left: 5px solid #059669;
+            background: #f0fdf4;
+            border-left: 4px solid #059669;
         }
 
         .conclusion-summary {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #065f46;
-            padding: 12px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 12px;
             margin-bottom: 16px;
             line-height: 1.5;
         }
@@ -375,17 +497,12 @@
         }
 
         .metric-value {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
         }
 
-        .metric-value.over {
-            color: #ef4444;
-        }
-
-        .metric-value.under {
-            color: #10b981;
-        }
+        .metric-value.over { color: #ef4444; }
+        .metric-value.under { color: #10b981; }
 
         .metric-bar {
             height: 4px;
@@ -401,30 +518,20 @@
             transition: width 0.3s;
         }
 
-        .metric-bar-fill.warning {
-            background: #ef4444;
-        }
-
-        .metric-bar-fill.success {
-            background: #10b981;
-        }
+        .metric-bar-fill.warning { background: #ef4444; }
+        .metric-bar-fill.success { background: #10b981; }
 
         .metric-advice {
             font-size: 0.65rem;
             color: #64748b;
         }
 
-        /* 表格样式 */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
+        .table-wrapper { overflow-x: auto; }
         .data-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
         }
-
         .data-table th {
             background: #f8fafc;
             padding: 10px 12px;
@@ -433,12 +540,10 @@
             color: #475569;
             border-bottom: 1px solid #eef2f6;
         }
-
         .data-table td {
             padding: 8px 12px;
             border-bottom: 1px solid #f1f5f9;
         }
-
         .data-table input, .data-table select {
             width: 100%;
             padding: 6px 8px;
@@ -454,25 +559,13 @@
             margin-bottom: 16px;
         }
 
-        .form-input, .form-select {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.85rem;
-            width: 100%;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #059669;
-        }
-
         .upload-area {
             border: 2px dashed #e2e8f0;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
             background: #fafcff;
+            margin-bottom: 20px;
         }
 
         .upload-label {
@@ -501,13 +594,11 @@
             overflow: hidden;
             border: 1px solid #e2e8f0;
         }
-
         .image-preview-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
         .image-delete-btn {
             position: absolute;
             top: 2px;
@@ -527,28 +618,42 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
-
         @media (max-width: 968px) {
-            .chart-grid {
-                grid-template-columns: 1fr;
-            }
-            .metrics-row {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
+            .chart-grid { grid-template-columns: 1fr; }
+            .metrics-row { grid-template-columns: 1fr; gap: 12px; }
+            .app-container { margin: 0 16px; }
         }
 
-        .chart-container {
-            height: 280px;
-            width: 100%;
-        }
+        .chart-container { height: 280px; width: 100%; }
+        .chart-container.large { height: 340px; }
 
-        .chart-container.large {
-            height: 340px;
+        .inline-edit-btn, .inline-delete-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            margin: 0 2px;
+        }
+        .inline-edit-btn {
+            background: #eef2ff;
+            color: #059669;
+        }
+        .inline-edit-btn:hover {
+            background: #059669;
+            color: white;
+        }
+        .inline-delete-btn {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        .inline-delete-btn:hover {
+            background: #ef4444;
+            color: white;
         }
 
         .knowledge-footer {
-            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            background: #ecfdf5;
             border-radius: 12px;
             padding: 12px 20px;
             margin-top: 24px;
@@ -564,95 +669,14 @@
             color: #94a3b8;
         }
 
-        .inline-edit-btn, .inline-delete-btn {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            border: none;
-            margin: 0 2px;
-        }
-
-        .inline-edit-btn {
-            background: #eef2ff;
-            color: #059669;
-        }
-
-        .inline-edit-btn:hover {
-            background: #059669;
-            color: white;
-        }
-
-        .inline-delete-btn {
-            background: #fef2f2;
-            color: #ef4444;
-        }
-
-        .inline-delete-btn:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #eef2f6;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid #eef2f6;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
         @media (max-width: 768px) {
-            .navbar {
-                padding: 0 16px;
-            }
-            .app-container {
-                padding: 16px;
-            }
-            .material-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .material-stats {
-                text-align: left;
-            }
-            .material-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-            .control-group {
-                display: none;
-            }
+            .navbar { padding: 0 16px; }
+            .material-row { flex-direction: column; align-items: flex-start; }
+            .material-stats { text-align: left; }
+            .material-actions { width: 100%; justify-content: flex-end; }
+            .control-group { display: none; }
+            .search-bar { flex-direction: column; align-items: stretch; }
+            .filter-select { width: 100%; }
         }
     </style>
 </head>
@@ -676,209 +700,277 @@
             </div>
         </nav>
 
-        <main class="app-container" :style="containerStyle">
-            <!-- 主页 - 长条形材料列表 -->
-            <div v-if="currentView === 'home'">
-                <div class="page-header">
-                    <div><h1 class="page-title">机电材料库</h1></div>
-                    <button class="btn-primary" @click="addNewMaterial">+ 新建材料</button>
-                </div>
-                <div class="material-list">
-                    <div v-for="mat in materialList" :key="mat.id" class="material-row">
-                        <div class="material-info" @click="openMaterialDetail(mat)">
-                            <div class="material-name">{{ mat.name }}</div>
-                            <div class="material-meta">{{ mat.supplier || '未设置供应商' }}</div>
-                        </div>
-                        <div class="material-stats" @click="openMaterialDetail(mat)">
-                            <div class="material-amount">{{ formatCurrency(mat.totalAmount || 0, 'CNY') }}</div>
-                            <div class="material-count">{{ (mat.expect?.length || 0) + (mat.actual?.length || 0) }} 条数据 · 更新于 {{ mat.updatedAt || '—' }}</div>
-                        </div>
-                        <div class="material-actions">
-                            <button class="icon-btn add" @click.stop="quickAddData(mat)">📝 新增数据</button>
-                            <button class="icon-btn edit" @click.stop="openMaterialDetail(mat)">✏️ 修改</button>
-                            <button class="icon-btn delete" @click.stop="confirmDeleteMaterial(mat)">🗑️ 删除</button>
-                        </div>
+        <div class="app-wrapper">
+            <main class="app-container" :style="containerStyle">
+                <!-- 主页 -->
+                <div v-if="currentView === 'home'">
+                    <div class="page-header">
+                        <div><h1 class="page-title">机电材料库</h1></div>
+                        <button class="btn-primary" @click="openAddMaterialModal">+ 新建材料</button>
                     </div>
-                    <div v-if="materialList.length === 0" style="text-align: center; padding: 60px; background: white; border-radius: 16px;">暂无材料，点击「新建材料」开始使用</div>
-                </div>
-            </div>
 
-            <!-- 详情页 -->
-            <div v-else-if="currentView === 'detail' && currentMaterial">
-                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
-                    <button class="btn-secondary" @click="goBackHome">← 返回</button>
-                    <h1 style="font-size: 1.5rem; font-weight: 600; flex: 1;">{{ currentMaterial.name }}</h1>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-secondary" @click="exportData('excel')">Excel</button>
-                        <button class="btn-secondary" @click="exportData('pdf')">PDF</button>
-                        <button class="btn-secondary" @click="exportData('word')">Word</button>
+                    <!-- 搜索和筛选栏 -->
+                    <div class="search-bar">
+                        <input type="text" class="search-input" v-model="searchKeyword" placeholder="🔍 搜索材料名称、品牌、供应商...">
+                        <select class="filter-select" v-model="filterCategory">
+                            <option value="">全部分类</option>
+                            <option value="供水">供水</option>
+                            <option value="排水">排水</option>
+                            <option value="电气">电气</option>
+                            <option value="其他">其他</option>
+                        </select>
                     </div>
-                </div>
 
-                <!-- 结论卡片 - 置顶 -->
-                <div class="card conclusion-card" v-if="analysisReport.hasData">
-                    <div class="conclusion-summary">{{ analysisReport.summary }}</div>
-                    <div class="metrics-row">
-                        <div class="metric-item">
-                            <div class="metric-name">📦 数量偏差</div>
-                            <div class="metric-value" :class="analysisReport.quantity.class">{{ analysisReport.quantity.text }}</div>
-                            <div class="metric-bar"><div class="metric-bar-fill" :class="analysisReport.quantity.barClass" :style="{ width: analysisReport.quantity.percent + '%' }"></div></div>
-                            <div class="metric-advice">{{ analysisReport.quantity.advice }}</div>
+                    <div class="material-list">
+                        <div v-for="mat in filteredMaterials" :key="mat.id" class="material-row">
+                            <div class="material-info" @click="openMaterialDetail(mat)">
+                                <div class="material-name">{{ mat.name }}</div>
+                                <div class="material-meta">
+                                    <span>{{ mat.brand || '未设置品牌' }}</span>
+                                    <span>{{ mat.supplier || '未设置供应商' }}</span>
+                                    <span>{{ mat.category || '未分类' }}</span>
+                                    <span>{{ mat.unit || '个' }}</span>
+                                </div>
+                            </div>
+                            <div class="material-stats" @click="openMaterialDetail(mat)">
+                                <div class="material-amount">{{ formatCurrency(mat.totalAmount || 0, 'CNY') }}</div>
+                                <div class="material-count">{{ (mat.expect?.length || 0) + (mat.actual?.length || 0) }} 条数据</div>
+                            </div>
+                            <div class="material-actions">
+                                <button class="icon-btn add" @click.stop="quickAddData(mat)">📝 新增数据</button>
+                                <button class="icon-btn edit" @click.stop="openMaterialDetail(mat)">✏️ 修改</button>
+                                <button class="icon-btn delete" @click.stop="confirmDeleteMaterial(mat)">🗑️ 删除</button>
+                            </div>
                         </div>
-                        <div class="metric-item">
-                            <div class="metric-name">💰 价格偏差</div>
-                            <div class="metric-value" :class="analysisReport.price.class">{{ analysisReport.price.text }}</div>
-                            <div class="metric-bar"><div class="metric-bar-fill" :class="analysisReport.price.barClass" :style="{ width: analysisReport.price.percent + '%' }"></div></div>
-                            <div class="metric-advice">{{ analysisReport.price.advice }}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-name">🔧 配件比例偏差</div>
-                            <div class="metric-value" :class="analysisReport.ratio.class">{{ analysisReport.ratio.text }}</div>
-                            <div class="metric-bar"><div class="metric-bar-fill" :class="analysisReport.ratio.barClass" :style="{ width: analysisReport.ratio.percent + '%' }"></div></div>
-                            <div class="metric-advice">{{ analysisReport.ratio.advice }}</div>
-                        </div>
+                        <div v-if="filteredMaterials.length === 0" style="text-align: center; padding: 60px; background: white; border-radius: 16px;">暂无材料，点击「新建材料」开始使用</div>
                     </div>
                 </div>
-                <div class="card conclusion-card" v-else>
-                    <div class="conclusion-summary">请先录入预期数据和实际数据，系统将自动分析数量、价格、配件比例的偏差情况。</div>
-                </div>
 
-                <!-- 可折叠的数据录入区域 -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">📝 数据录入与编辑</div>
-                        <button class="toggle-btn" @click="toggleDataSection">{{ dataSectionCollapsed ? '▼ 展开数据录入' : '▲ 收起数据录入' }}</button>
+                <!-- 详情页 -->
+                <div v-else-if="currentView === 'detail' && currentMaterial">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="btn-secondary" @click="goBackHome">← 返回</button>
+                        <h1 style="font-size: 1.3rem; font-weight: 600; flex: 1;">{{ currentMaterial.name }}</h1>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-secondary" @click="exportData('excel')">Excel</button>
+                            <button class="btn-secondary" @click="exportData('pdf')">PDF</button>
+                            <button class="btn-secondary" @click="exportData('word')">Word</button>
+                        </div>
                     </div>
-                    <div class="collapsible" :class="{ closed: dataSectionCollapsed }" style="max-height: 2000px;">
-                        <!-- 文件上传 -->
-                        <div class="upload-area" style="margin-bottom: 20px;">
-                            <label class="upload-label">📂 上传文件<input type="file" @change="handleFileUpload" accept=".xlsx,.xls,.csv" style="display: none;"></label>
-                            <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 8px;">支持 Excel/CSV，自动解析添加到数据表</div>
-                        </div>
 
-                        <!-- 预期数据表格 -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <span style="font-weight: 600;">📌 预期数据 ({{ expectRecords.length }} 条)</span>
-                                <button class="btn-secondary" style="padding: 4px 12px;" @click="addNewRow('expect')">+ 新增行</button>
+                    <!-- 结论卡片 -->
+                    <div class="card conclusion-card" v-if="analysisReport.hasData">
+                        <div class="conclusion-summary">{{ analysisReport.summary }}</div>
+                        <div class="metrics-row">
+                            <div class="metric-item">
+                                <div class="metric-name">📦 数量偏差</div>
+                                <div class="metric-value" :class="analysisReport.quantity.class">{{ analysisReport.quantity.text }}</div>
+                                <div class="metric-bar"><div class="metric-bar-fill" :class="analysisReport.quantity.barClass" :style="{ width: analysisReport.quantity.percent + '%' }"></div></div>
+                                <div class="metric-advice">{{ analysisReport.quantity.advice }}</div>
                             </div>
-                            <div class="table-wrapper">
-                                <table class="data-table">
-                                    <thead><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>订货量</th><th>单价</th><th>总价</th><th>币种</th><th>类型</th><th>比例%</th><th>操作</th></tr></thead>
-                                    <tbody>
-                                        <tr v-for="row in expectRecords" :key="row.id">
-                                            <td><input v-model="row.materialName" @blur="saveToStorageDelayed"></td>
-                                            <td><input v-model="row.model" @blur="saveToStorageDelayed"></td>
-                                            <td><input type="number" v-model.number="row.bq" @blur="saveToStorageDelayed" style="width:70px"></td>
-                                            <td><input type="number" v-model.number="row.contract" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><input type="number" v-model.number="row.orderQty" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><input type="number" v-model.number="row.unitPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><input type="number" v-model.number="row.totalPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><select v-model="row.currency" @change="saveToStorageDelayed" style="width:65px"><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="MOP">MOP</option></select></td>
-                                            <td><select v-model="row.isAccessory" @change="saveToStorageDelayed" style="width:65px"><option :value="false">主材</option><option :value="true">配件</option></select></td>
-                                            <td><input type="number" v-model.number="row.expectRatio" @blur="saveToStorageDelayed" style="width:60px"></td>
-                                            <td><button class="inline-edit-btn" @click="loadRecordToForm(row, 'expect')">修改</button><button class="inline-delete-btn" @click="deleteRecord(row, 'expect')">删除</button></td>
-                                        </tr>
-                                        <tr v-if="expectRecords.length === 0"><td colspan="11" style="text-align:center; padding:24px;">暂无数据，点击「+ 新增行」添加</td></tr>
-                                    </tbody>
-                                </table>
+                            <div class="metric-item">
+                                <div class="metric-name">💰 价格偏差</div>
+                                <div class="metric-value" :class="analysisReport.price.class">{{ analysisReport.price.text }}</div>
+                                <div class="metric-bar"><div class="metric-bar-fill" :class="analysisReport.price.barClass" :style="{ width: analysisReport.price.percent + '%' }"></div></div>
+                                <div class="metric-advice">{{ analysisReport.price.advice }}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-name">🔧 配件比例偏差</div>
+                                <div class="metric-value" :class="analysisReport.ratio.class">{{ analysisReport.ratio.text }}</div>
+                                <div class="metric-bar"><div class="metric-bar-fill" :class="analysisReport.ratio.barClass" :style="{ width: analysisReport.ratio.percent + '%' }"></div></div>
+                                <div class="metric-advice">{{ analysisReport.ratio.advice }}</div>
                             </div>
                         </div>
+                    </div>
+                    <div class="card conclusion-card" v-else>
+                        <div class="conclusion-summary">请先录入预期数据和实际数据，系统将自动分析数量、价格、配件比例的偏差情况。</div>
+                    </div>
 
-                        <!-- 实际数据表格 -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <span style="font-weight: 600;">📌 实际数据 ({{ actualRecords.length }} 条)</span>
-                                <button class="btn-secondary" style="padding: 4px 12px;" @click="addNewRow('actual')">+ 新增行</button>
-                            </div>
-                            <div class="table-wrapper">
-                                <table class="data-table">
-                                    <thead><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>到货量</th><th>单价</th><th>总价</th><th>币种</th><th>类型</th><th>比例%</th><th>操作</th></tr></thead>
-                                    <tbody>
-                                        <tr v-for="row in actualRecords" :key="row.id">
-                                            <td><input v-model="row.materialName" @blur="saveToStorageDelayed"></td>
-                                            <td><input v-model="row.model" @blur="saveToStorageDelayed"></td>
-                                            <td><input type="number" v-model.number="row.bq" @blur="saveToStorageDelayed" style="width:70px"></td>
-                                            <td><input type="number" v-model.number="row.contract" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><input type="number" v-model.number="row.arrivalQty" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><input type="number" v-model.number="row.unitPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><input type="number" v-model.number="row.totalPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
-                                            <td><select v-model="row.currency" @change="saveToStorageDelayed" style="width:65px"><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="MOP">MOP</option></select></td>
-                                            <td><select v-model="row.isAccessory" @change="saveToStorageDelayed" style="width:65px"><option :value="false">主材</option><option :value="true">配件</option></select></td>
-                                            <td><input type="number" v-model.number="row.actualRatio" @blur="saveToStorageDelayed" style="width:60px"></td>
-                                            <td><button class="inline-edit-btn" @click="loadRecordToForm(row, 'actual')">修改</button><button class="inline-delete-btn" @click="deleteRecord(row, 'actual')">删除</button></td>
-                                        </tr>
-                                        <tr v-if="actualRecords.length === 0"><td colspan="11" style="text-align:center; padding:24px;">暂无数据，点击「+ 新增行」添加</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- 可折叠的数据录入区域 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📝 数据录入与编辑</div>
+                            <button class="toggle-btn" @click="toggleDataSection">{{ dataSectionCollapsed ? '▼ 展开数据录入' : '▲ 收起数据录入' }}</button>
                         </div>
+                        <div class="collapsible" :class="{ closed: dataSectionCollapsed }" style="max-height: 2000px;">
+                            <div class="upload-area">
+                                <label class="upload-label">📂 上传 Excel 文件<input type="file" @change="handleFileUpload" accept=".xlsx,.xls,.csv" style="display: none;"></label>
+                                <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 8px;">支持 Excel/CSV 格式，自动解析添加到数据表</div>
+                            </div>
 
-                        <!-- 编辑表单 -->
-                        <div>
-                            <div style="font-weight: 600; margin-bottom: 12px;">✏️ 编辑表单（点击表格【修改】按钮加载）</div>
-                            <div class="form-grid">
-                                <input v-model="editForm.materialName" class="form-input" placeholder="材料名称">
-                                <input v-model="editForm.model" class="form-input" placeholder="型号规格">
-                                <input v-model="editForm.supplier" class="form-input" placeholder="供应商">
-                                <input type="number" v-model.number="editForm.bq" class="form-input" placeholder="BQ量">
-                                <input type="number" v-model.number="editForm.contract" class="form-input" placeholder="合同图量">
-                                <input type="number" v-model.number="editForm.orderQty" class="form-input" placeholder="订货量">
-                                <input type="number" v-model.number="editForm.arrivalQty" class="form-input" placeholder="到货量">
-                                <input type="number" v-model.number="editForm.unitPrice" class="form-input" placeholder="单价">
-                                <input type="number" v-model.number="editForm.totalPrice" class="form-input" placeholder="总价">
-                                <select v-model="editForm.currency" class="form-select"><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="MOP">MOP</option></select>
-                                <select v-model="editForm.isAccessory" class="form-select"><option :value="false">主材</option><option :value="true">配件</option></select>
-                                <input type="number" v-model.number="editForm.expectRatio" class="form-input" placeholder="预期比例%">
-                                <input type="number" v-model.number="editForm.actualRatio" class="form-input" placeholder="实际比例%">
-                                <select v-model="editForm.dataType" class="form-select"><option value="expect">预期数据</option><option value="actual">实际数据</option></select>
+                            <!-- 预期数据表格 -->
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <span style="font-weight: 600;">📌 预期数据 ({{ expectRecords.length }} 条)</span>
+                                    <button class="btn-secondary" style="padding: 4px 12px;" @click="addNewRow('expect')">+ 新增行</button>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="data-table">
+                                        <thead><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>订货量</th><th>单价</th><th>总价</th><th>币种</th><th>类型</th><th>比例%</th><th>操作</th></tr></thead>
+                                        <tbody>
+                                            <tr v-for="row in expectRecords" :key="row.id">
+                                                <td><input v-model="row.materialName" @blur="saveToStorageDelayed"></td>
+                                                <td><input v-model="row.model" @blur="saveToStorageDelayed"></td>
+                                                <td><input type="number" v-model.number="row.bq" @blur="saveToStorageDelayed" style="width:70px"></td>
+                                                <td><input type="number" v-model.number="row.contract" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><input type="number" v-model.number="row.orderQty" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><input type="number" v-model.number="row.unitPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><input type="number" v-model.number="row.totalPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><select v-model="row.currency" @change="saveToStorageDelayed" style="width:65px"><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="MOP">MOP</option></select></td>
+                                                <td><select v-model="row.isAccessory" @change="saveToStorageDelayed" style="width:65px"><option :value="false">主材</option><option :value="true">配件</option></select></td>
+                                                <td><input type="number" v-model.number="row.expectRatio" @blur="saveToStorageDelayed" style="width:60px"></td>
+                                                <td><button class="inline-edit-btn" @click="loadRecordToForm(row, 'expect')">修改</button><button class="inline-delete-btn" @click="deleteRecord(row, 'expect')">删除</button></td>
+                                            </tr>
+                                            <tr v-if="expectRecords.length === 0"><td colspan="11" style="text-align:center; padding:24px;">暂无数据，点击「+ 新增行」添加</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                            <div style="display: flex; gap: 12px;">
-                                <button class="btn-primary" @click="saveRecord">💾 {{ selectedRecord ? '更新保存' : '新增保存' }}</button>
-                                <button v-if="selectedRecord" class="btn-secondary" @click="clearSelection">取消选中</button>
-                            </div>
-                        </div>
 
-                        <!-- 图片上传 -->
-                        <div style="margin-top: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
-                                <span>🖼️ 关联图纸/照片</span>
-                                <label class="upload-label" style="padding: 6px 16px;">📷 上传图片<input type="file" @change="handleImageUpload" accept="image/*" multiple style="display: none;"></label>
+                            <!-- 实际数据表格 -->
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <span style="font-weight: 600;">📌 实际数据 ({{ actualRecords.length }} 条)</span>
+                                    <button class="btn-secondary" style="padding: 4px 12px;" @click="addNewRow('actual')">+ 新增行</button>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="data-table">
+                                        <thead><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>到货量</th><th>单价</th><th>总价</th><th>币种</th><th>类型</th><th>比例%</th><th>操作</th></tr></thead>
+                                        <tbody>
+                                            <tr v-for="row in actualRecords" :key="row.id">
+                                                <td><input v-model="row.materialName" @blur="saveToStorageDelayed"></td>
+                                                <td><input v-model="row.model" @blur="saveToStorageDelayed"></td>
+                                                <td><input type="number" v-model.number="row.bq" @blur="saveToStorageDelayed" style="width:70px"></td>
+                                                <td><input type="number" v-model.number="row.contract" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><input type="number" v-model.number="row.arrivalQty" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><input type="number" v-model.number="row.unitPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><input type="number" v-model.number="row.totalPrice" @blur="saveToStorageDelayed" style="width:80px"></td>
+                                                <td><select v-model="row.currency" @change="saveToStorageDelayed" style="width:65px"><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="MOP">MOP</option></select></td>
+                                                <td><select v-model="row.isAccessory" @change="saveToStorageDelayed" style="width:65px"><option :value="false">主材</option><option :value="true">配件</option></select></td>
+                                                <td><input type="number" v-model.number="row.actualRatio" @blur="saveToStorageDelayed" style="width:60px"></td>
+                                                <td><button class="inline-edit-btn" @click="loadRecordToForm(row, 'actual')">修改</button><button class="inline-delete-btn" @click="deleteRecord(row, 'actual')">删除</button></td>
+                                            </tr>
+                                            <tr v-if="actualRecords.length === 0"><td colspan="11" style="text-align:center; padding:24px;">暂无数据，点击「+ 新增行」添加</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                            <div class="image-preview-grid">
-                                <div v-for="(img, idx) in materialImages" :key="idx" class="image-preview-item">
-                                    <img :src="img.url">
-                                    <button class="image-delete-btn" @click="deleteImage(idx)">✕</button>
+
+                            <!-- 编辑表单 -->
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 12px;">✏️ 编辑表单（点击表格【修改】按钮加载）</div>
+                                <div class="form-grid">
+                                    <input v-model="editForm.materialName" class="form-input" placeholder="材料名称">
+                                    <input v-model="editForm.model" class="form-input" placeholder="型号规格">
+                                    <input v-model="editForm.supplier" class="form-input" placeholder="供应商">
+                                    <input type="number" v-model.number="editForm.bq" class="form-input" placeholder="BQ量">
+                                    <input type="number" v-model.number="editForm.contract" class="form-input" placeholder="合同图量">
+                                    <input type="number" v-model.number="editForm.orderQty" class="form-input" placeholder="订货量">
+                                    <input type="number" v-model.number="editForm.arrivalQty" class="form-input" placeholder="到货量">
+                                    <input type="number" v-model.number="editForm.unitPrice" class="form-input" placeholder="单价">
+                                    <input type="number" v-model.number="editForm.totalPrice" class="form-input" placeholder="总价">
+                                    <select v-model="editForm.currency" class="form-select"><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="MOP">MOP</option></select>
+                                    <select v-model="editForm.isAccessory" class="form-select"><option :value="false">主材</option><option :value="true">配件</option></select>
+                                    <input type="number" v-model.number="editForm.expectRatio" class="form-input" placeholder="预期比例%">
+                                    <input type="number" v-model.number="editForm.actualRatio" class="form-input" placeholder="实际比例%">
+                                    <select v-model="editForm.dataType" class="form-select"><option value="expect">预期数据</option><option value="actual">实际数据</option></select>
+                                </div>
+                                <div style="display: flex; gap: 12px;">
+                                    <button class="btn-primary" @click="saveRecord">💾 {{ selectedRecord ? '更新保存' : '新增保存' }}</button>
+                                    <button v-if="selectedRecord" class="btn-secondary" @click="clearSelection">取消选中</button>
+                                </div>
+                            </div>
+
+                            <!-- 图片上传 -->
+                            <div style="margin-top: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                                    <span>🖼️ 关联图纸/照片</span>
+                                    <label class="upload-label" style="padding: 6px 16px;">📷 上传图片<input type="file" @change="handleImageUpload" accept="image/*" multiple style="display: none;"></label>
+                                </div>
+                                <div class="image-preview-grid">
+                                    <div v-for="(img, idx) in materialImages" :key="idx" class="image-preview-item">
+                                        <img :src="img.url">
+                                        <button class="image-delete-btn" @click="deleteImage(idx)">✕</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 图表区域 - 重点展示 -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">📊 数量对比分析</div>
-                        <select class="form-select" style="width: 100px;" @change="switchChartType('quantity', $event.target.value)">
-                            <option value="bar">柱状图</option><option value="line">折线图</option>
+                    <!-- 图表区域 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📊 数量对比分析</div>
+                            <select class="form-select" style="width: 100px;" @change="switchChartType('quantity', $event.target.value)">
+                                <option value="bar">柱状图</option><option value="line">折线图</option>
+                            </select>
+                        </div>
+                        <div id="quantityChart" class="chart-container large"></div>
+                    </div>
+
+                    <div class="chart-grid">
+                        <div class="card"><div class="card-header">💰 单价对比</div><div id="unitPriceChart" class="chart-container"></div></div>
+                        <div class="card"><div class="card-header">💵 总价对比</div><div id="totalPriceChart" class="chart-container"></div></div>
+                        <div class="card"><div class="card-header">📐 预期配件比例</div><div id="expectRatioChart" class="chart-container"></div></div>
+                        <div class="card"><div class="card-header">📐 实际配件比例</div><div id="actualRatioChart" class="chart-container"></div></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 新建材料弹窗 -->
+        <div v-if="showAddModal" class="modal-overlay" @click.self="showAddModal = false">
+            <div class="modal-content">
+                <div class="modal-header"><h3>新建材料</h3><button style="background:none; border:none; font-size:24px; cursor:pointer;" @click="showAddModal = false">&times;</button></div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label"><span class="required">*</span> 材料名称</label>
+                        <input v-model="newMaterial.name" class="form-input" placeholder="请输入材料名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">品牌</label>
+                        <input v-model="newMaterial.brand" class="form-input" placeholder="请输入品牌">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">供应商</label>
+                        <input v-model="newMaterial.supplier" class="form-input" placeholder="请输入供应商">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">材料分类</label>
+                        <select v-model="newMaterial.category" class="form-select">
+                            <option value="供水">供水</option>
+                            <option value="排水">排水</option>
+                            <option value="电气">电气</option>
+                            <option value="其他">其他</option>
                         </select>
                     </div>
-                    <div id="quantityChart" class="chart-container large"></div>
+                    <div class="form-group">
+                        <label class="form-label">计量单位</label>
+                        <select v-model="newMaterial.unit" class="form-select">
+                            <option value="米">米 (m)</option>
+                            <option value="个">个</option>
+                            <option value="卷">卷</option>
+                            <option value="吨">吨 (t)</option>
+                            <option value="平方米">平方米 (m²)</option>
+                            <option value="千克">千克 (kg)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea v-model="newMaterial.remark" class="form-textarea" rows="3" placeholder="选填，特殊说明"></textarea>
+                    </div>
                 </div>
-
-                <div class="chart-grid">
-                    <div class="card"><div class="card-header">💰 单价对比</div><div id="unitPriceChart" class="chart-container"></div></div>
-                    <div class="card"><div class="card-header">💵 总价对比</div><div id="totalPriceChart" class="chart-container"></div></div>
-                    <div class="card"><div class="card-header">📐 预期配件比例</div><div id="expectRatioChart" class="chart-container"></div></div>
-                    <div class="card"><div class="card-header">📐 实际配件比例</div><div id="actualRatioChart" class="chart-container"></div></div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" @click="showAddModal = false">取消</button>
+                    <button class="btn-primary" @click="addNewMaterialConfirm">确定</button>
                 </div>
             </div>
-        </main>
+        </div>
 
         <!-- 合并规则弹窗 -->
         <div v-if="showMergeModal" class="modal-overlay" @click.self="showMergeModal = false">
             <div class="modal-content">
-                <div class="modal-header"><h3>材料合并规则</h3><button style="float:right; background:none; border:none; font-size:24px;" @click="showMergeModal=false">&times;</button></div>
+                <div class="modal-header"><h3>材料合并规则</h3><button style="background:none; border:none; font-size:24px; cursor:pointer;" @click="showMergeModal=false">&times;</button></div>
                 <div class="modal-body">
                     <div v-for="rule in mergeRules" :key="rule.original" style="display: flex; justify-content: space-between; padding: 8px 0;">"{{ rule.original }}" → {{ rule.target }}<button class="btn-secondary" style="padding:2px 8px;" @click="removeMergeRule(rule.original)">取消</button></div>
                     <hr><div style="margin: 12px 0;">手动添加</div>
@@ -889,7 +981,7 @@
         </div>
 
         <div class="knowledge-footer">✨ 机电安装小知识 · {{ dailyTip }}</div>
-        <footer>材知道 · 点击【▲ 收起数据录入】专注查看图表分析</footer>
+        <footer>材知道 · 智能机电材料分析平台 | 数据自动保存至浏览器</footer>
     </div>
 
     <script>
@@ -902,16 +994,16 @@
         };
 
         const loadData = () => {
-            const saved = localStorage.getItem('czd-materials-v12');
+            const saved = localStorage.getItem('czd-materials-v15');
             if (saved) { try { return JSON.parse(saved); } catch(e) {} }
             return [
-                { id: generateId(), name: '电缆', supplier: '远东电缆', totalAmount: 125000, updatedAt: new Date().toISOString().slice(0,10), expect: [], actual: [], images: [] },
-                { id: generateId(), name: '镀锌钢管', supplier: '友发钢管', totalAmount: 89000, updatedAt: new Date().toISOString().slice(0,10), expect: [], actual: [], images: [] }
+                { id: generateId(), name: '电缆', brand: '远东', supplier: '远东电缆', category: '电气', unit: '米', remark: '', totalAmount: 125000, updatedAt: new Date().toISOString().slice(0,10), expect: [], actual: [], images: [] },
+                { id: generateId(), name: '镀锌钢管', brand: '友发', supplier: '友发钢管', category: '排水', unit: '米', remark: '', totalAmount: 89000, updatedAt: new Date().toISOString().slice(0,10), expect: [], actual: [], images: [] }
             ];
         };
-        const saveData = (data) => localStorage.setItem('czd-materials-v12', JSON.stringify(data));
-        const loadMergeRules = () => { const saved = localStorage.getItem('czd-merge-rules-v12'); return saved ? JSON.parse(saved) : []; };
-        const saveMergeRules = (rules) => localStorage.setItem('czd-merge-rules-v12', JSON.stringify(rules));
+        const saveData = (data) => localStorage.setItem('czd-materials-v15', JSON.stringify(data));
+        const loadMergeRules = () => { const saved = localStorage.getItem('czd-merge-rules-v15'); return saved ? JSON.parse(saved) : []; };
+        const saveMergeRules = (rules) => localStorage.setItem('czd-merge-rules-v15', JSON.stringify(rules));
         const knowledgeDB = ["🔧 桥架直线段>30m设伸缩节", "⚡ 小管让大管，有压让无压", "💧 镀锌钢管外露2-3扣防腐", "📐 母线槽每层设弹簧支架", "🎛️ 风管弯头无导流片阻力+15%"];
 
         createApp({
@@ -925,17 +1017,42 @@
                 const materialImages = ref([]);
                 const selectedRecord = ref(null);
                 const showMergeModal = ref(false);
+                const showAddModal = ref(false);
                 const newMergeOriginal = ref('');
                 const newMergeTarget = ref('');
+                const searchKeyword = ref('');
+                const filterCategory = ref('');
                 const scale = ref(1);
                 const baseFontSize = ref(14);
                 const dataSectionCollapsed = ref(false);
                 let saveTimer = null;
+                
+                const newMaterial = ref({
+                    name: '', brand: '', supplier: '', category: '电气', unit: '米', remark: ''
+                });
+
                 const editForm = ref({ id: null, materialName: '', model: '', supplier: '', bq: null, contract: null, orderQty: null, arrivalQty: null, unitPrice: null, totalPrice: null, currency: 'CNY', isAccessory: false, expectRatio: null, actualRatio: null, dataType: 'expect' });
                 const chartTypes = ref({ quantity: 'bar', unitPrice: 'bar', totalPrice: 'bar', expectRatio: 'pie', actualRatio: 'pie' });
                 let chartInstances = {};
                 const materialList = computed(() => materials.value);
-                const containerStyle = computed(() => ({ transform: `scale(${scale.value})`, transformOrigin: 'top left' }));
+                
+                const filteredMaterials = computed(() => {
+                    let list = materials.value;
+                    if (searchKeyword.value) {
+                        const kw = searchKeyword.value.toLowerCase();
+                        list = list.filter(m => 
+                            m.name.toLowerCase().includes(kw) || 
+                            (m.brand && m.brand.toLowerCase().includes(kw)) || 
+                            (m.supplier && m.supplier.toLowerCase().includes(kw))
+                        );
+                    }
+                    if (filterCategory.value) {
+                        list = list.filter(m => m.category === filterCategory.value);
+                    }
+                    return list;
+                });
+                
+                const containerStyle = computed(() => ({ transform: `scale(${scale.value})`, transformOrigin: 'center top' }));
                 const dailyTip = knowledgeDB[new Date().getDate() % knowledgeDB.length];
 
                 // 智能分析报告
@@ -999,18 +1116,39 @@
                         summary,
                         quantity: getMetric(quantityDev, '数量'),
                         price: getMetric(priceDev, '单价'),
-                        total: getMetric(totalDev, '总价'),
                         ratio: getMetric(ratioDev, '配件比例')
                     };
                 });
 
                 const toggleDataSection = () => { dataSectionCollapsed.value = !dataSectionCollapsed.value; };
                 const quickAddData = (mat) => { openMaterialDetail(mat); dataSectionCollapsed.value = false; };
+                const openAddMaterialModal = () => {
+                    newMaterial.value = { name: '', brand: '', supplier: '', category: '电气', unit: '米', remark: '' };
+                    showAddModal.value = true;
+                };
+                const addNewMaterialConfirm = () => {
+                    if (!newMaterial.value.name.trim()) { alert('材料名称不能为空'); return; }
+                    materials.value.push({
+                        id: generateId(),
+                        name: newMaterial.value.name.trim(),
+                        brand: newMaterial.value.brand,
+                        supplier: newMaterial.value.supplier,
+                        category: newMaterial.value.category,
+                        unit: newMaterial.value.unit,
+                        remark: newMaterial.value.remark,
+                        totalAmount: 0,
+                        updatedAt: new Date().toISOString().slice(0,10),
+                        expect: [],
+                        actual: [],
+                        images: []
+                    });
+                    saveAllData();
+                    showAddModal.value = false;
+                };
 
                 const saveAllData = () => { materials.value.forEach(m => { const total = (m.expect || []).reduce((s, r) => s + (r.totalPrice || 0), 0) + (m.actual || []).reduce((s, r) => s + (r.totalPrice || 0), 0); m.totalAmount = total; m.updatedAt = new Date().toISOString().slice(0,10); }); saveData(materials.value); saveMergeRules(mergeRules.value); };
                 const saveToStorageDelayed = () => { if (saveTimer) clearTimeout(saveTimer); saveTimer = setTimeout(() => { if (currentMaterial.value) { const idx = materials.value.findIndex(m => m.id === currentMaterial.value.id); if (idx !== -1) { materials.value[idx].expect = expectRecords.value; materials.value[idx].actual = actualRecords.value; materials.value[idx].images = materialImages.value; saveAllData(); refreshCharts(); } } }, 500); };
                 
-                const addNewMaterial = () => { const name = prompt('材料名称：'); if (name && name.trim()) { materials.value.push({ id: generateId(), name: name.trim(), supplier: '', totalAmount: 0, updatedAt: new Date().toISOString().slice(0,10), expect: [], actual: [], images: [] }); saveAllData(); } };
                 const confirmDeleteMaterial = (mat) => { if (confirm(`删除"${mat.name}"？`)) { materials.value = materials.value.filter(m => m.id !== mat.id); saveAllData(); if (currentMaterial.value?.id === mat.id) goBackHome(); } };
                 const openMaterialDetail = (mat) => { currentMaterial.value = mat; expectRecords.value = JSON.parse(JSON.stringify(mat.expect || [])); actualRecords.value = JSON.parse(JSON.stringify(mat.actual || [])); materialImages.value = JSON.parse(JSON.stringify(mat.images || [])); currentView.value = 'detail'; selectedRecord.value = null; setTimeout(() => refreshCharts(), 100); };
                 const goBackHome = () => { if (currentMaterial.value) { const idx = materials.value.findIndex(m => m.id === currentMaterial.value.id); if (idx !== -1) { materials.value[idx].expect = expectRecords.value; materials.value[idx].actual = actualRecords.value; materials.value[idx].images = materialImages.value; saveAllData(); } } for (let key in chartInstances) { if (chartInstances[key]) chartInstances[key].dispose(); delete chartInstances[key]; } currentView.value = 'home'; currentMaterial.value = null; };
@@ -1057,7 +1195,7 @@
                         const element = document.querySelector('.app-container');
                         if (element) html2pdf().from(element).set({ filename: `${currentMaterial.value.name}_报告.pdf`, margin: 10 }).save();
                     } else if (format === 'word') {
-                        let html = `<html><head><meta charset="UTF-8"><title>${currentMaterial.value.name}报告</title></head><body><h1>${currentMaterial.value.name} - 材料分析报告</h1><p>${analysisReport.value.summary}</p><h2>预期数据</h2><table border="1"><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>订货量</th><th>单价</th><th>总价</th><th>币种</th><th>比例%</th></tr>${expectRecords.value.map(r => `<tr><td>${r.materialName}</td><td>${r.model}</td><td>${r.bq}</td><td>${r.contract}</td><td>${r.orderQty}</td><td>${r.unitPrice}</td><td>${r.totalPrice}</td><td>${r.currency}</td><td>${r.expectRatio}%</td></tr>`).join('')}</table><h2>实际数据</h2><table border="1"><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>到货量</th><th>单价</th><th>总价</th><th>币种</th><th>比例%</th></tr>${actualRecords.value.map(r => `<tr><td>${r.materialName}</td><td>${r.model}</td><td>${r.bq}</td><td>${r.contract}</td><td>${r.arrivalQty}</td><td>${r.unitPrice}</td><td>${r.totalPrice}</td><td>${r.currency}</td><td>${r.actualRatio}%</td></td>`).join('')}</table></body></html>`;
+                        let html = `<html><head><meta charset="UTF-8"><title>${currentMaterial.value.name}报告</title></head><body><h1>${currentMaterial.value.name} - 材料分析报告</h1><p>${analysisReport.value.summary}</p><h2>预期数据</h2><table border="1"><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>订货量</th><th>单价</th><th>总价</th><th>币种</th><th>比例%</th></tr>${expectRecords.value.map(r => `<tr><td>${r.materialName}</td><td>${r.model}</td><td>${r.bq}</td><td>${r.contract}</td><td>${r.orderQty}</td><td>${r.unitPrice}</td><td>${r.totalPrice}</td><td>${r.currency}</td><td>${r.expectRatio}%</td></tr>`).join('')}</td><h2>实际数据</h2><table border="1"><tr><th>材料名</th><th>型号</th><th>BQ量</th><th>合同图量</th><th>到货量</th><th>单价</th><th>总价</th><th>币种</th><th>比例%</th></tr>${actualRecords.value.map(r => `<tr><td>${r.materialName}</td><td>${r.model}</td><td>${r.bq}</td><td>${r.contract}</td><td>${r.arrivalQty}</td><td>${r.unitPrice}</td><td>${r.totalPrice}</td><td>${r.currency}</td><td>${r.actualRatio}%</td></tr>`).join('')}</tr></body></html>`;
                         const blob = new Blob([html], { type: 'application/msword' });
                         saveAs(blob, `${currentMaterial.value.name}_报告.doc`);
                     }
@@ -1096,7 +1234,7 @@
                 watch([expectRecords, actualRecords], () => { refreshCharts(); }, { deep: true });
                 onMounted(() => { document.documentElement.style.fontSize = baseFontSize.value + 'px'; window.addEventListener('resize', () => setTimeout(() => refreshCharts(), 100)); });
                 
-                return { materialList, mergeRules, currentView, currentMaterial, expectRecords, actualRecords, materialImages, selectedRecord, editForm, showMergeModal, newMergeOriginal, newMergeTarget, scale, containerStyle, dailyTip, chartTypes, analysisReport, dataSectionCollapsed, formatCurrency, addNewMaterial, confirmDeleteMaterial, openMaterialDetail, goBackHome, quickAddData, toggleDataSection, addNewRow, loadRecordToForm, clearSelection, saveRecord, deleteRecord, handleFileUpload, handleImageUpload, deleteImage, exportData, switchChartType, addMergeRule, removeMergeRule, exportGlobalReport, zoomPage, resetZoom, changeFontSize, saveToStorageDelayed };
+                return { materialList, filteredMaterials, searchKeyword, filterCategory, mergeRules, currentView, currentMaterial, expectRecords, actualRecords, materialImages, selectedRecord, editForm, showMergeModal, showAddModal, newMaterial, newMergeOriginal, newMergeTarget, scale, containerStyle, dailyTip, chartTypes, analysisReport, dataSectionCollapsed, formatCurrency, openAddMaterialModal, addNewMaterialConfirm, confirmDeleteMaterial, openMaterialDetail, goBackHome, quickAddData, toggleDataSection, addNewRow, loadRecordToForm, clearSelection, saveRecord, deleteRecord, handleFileUpload, handleImageUpload, deleteImage, exportData, switchChartType, addMergeRule, removeMergeRule, exportGlobalReport, zoomPage, resetZoom, changeFontSize, saveToStorageDelayed };
             }
         }).mount('#app');
     </script>
